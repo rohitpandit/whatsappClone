@@ -6,7 +6,7 @@ import Dashboard from './Dashboard.js';
 function App() {
 	const [id, setId] = useLocalStorage('id');
 
-	return <>{id ? <Dashboard /> : <Login onIdSubmit={setId} />}</>;
+	return id ? <Dashboard id={id} /> : <Login onIdSubmit={setId} />;
 }
 
 export default App;
