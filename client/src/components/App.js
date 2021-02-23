@@ -1,7 +1,8 @@
 import React from 'react';
+import Login from './Login.js';
 
 function App() {
-	return 'Hello World';
+	return <Login />;
 }
 
 export default App;
