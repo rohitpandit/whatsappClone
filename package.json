@@ -1,0 +1,27 @@
+{
+  "name": "whatsappClone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon server.js",
+    "start":"node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rohitpandit0311/whatsappClone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rohitpandit0311/whatsappClone/issues"
+  },
+  "homepage": "https://github.com/rohitpandit0311/whatsappClone#readme",
+  "dependencies": {
+    "socket.io": "^3.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
