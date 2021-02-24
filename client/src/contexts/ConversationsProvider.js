@@ -5,26 +5,26 @@ import { useSocket } from './SocketProvider';
 
 const ConversationsContext = React.createContext();
 
-export const useConversations = () => {
+export function useConversations() {
 	return useContext(ConversationsContext);
-};
+}
 
-export const ConversationsProvider = ({ id, children }) => {
+export function ConversationsProvider({ id, children }) {
 	const [conversations, setConversations] = useLocalStorage(
-		'Conversations',
+		'conversations',
 		[]
 	);
 	const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
 	const { contacts } = useContacts();
 	const socket = useSocket();
 
-	const createConversations = (recipients) => {
+	function createConversation(recipients) {
 		setConversations((prevConversations) => {
 			return [...prevConversations, { recipients, messages: [] }];
 		});
-	};
+	}
 
-	const addMessageToCoversation = useCallback(
+	const addMessageToConversation = useCallback(
 		({ recipients, text, sender }) => {
 			setConversations((prevConversations) => {
 				let madeChange = false;
@@ -37,19 +37,14 @@ export const ConversationsProvider = ({ id, children }) => {
 							messages: [...conversation.messages, newMessage],
 						};
 					}
+
 					return conversation;
 				});
 
 				if (madeChange) {
 					return newConversations;
 				} else {
-					return [
-						...prevConversations,
-						{
-							recipients,
-							messages: [newMessage],
-						},
-					];
+					return [...prevConversations, { recipients, messages: [newMessage] }];
 				}
 			});
 		},
@@ -59,15 +54,16 @@ export const ConversationsProvider = ({ id, children }) => {
 	useEffect(() => {
 		if (socket == null) return;
 
-		socket.on('recieve-message', addMessageToCoversation);
+		socket.on('receive-message', addMessageToConversation);
 
-		return () => socket.off('recieve-message');
-	}, [socket, addMessageToCoversation]);
+		return () => socket.off('receive-message');
+	}, [socket, addMessageToConversation]);
 
-	const sendMessage = (recipients, text) => {
+	function sendMessage(recipients, text) {
 		socket.emit('send-message', { recipients, text });
-		addMessageToCoversation({ recipients, text, sender: id });
-	};
+
+		addMessageToConversation({ recipients, text, sender: id });
+	}
 
 	const formattedConversations = conversations.map((conversation, index) => {
 		const recipients = conversation.recipients.map((recipient) => {
@@ -83,7 +79,7 @@ export const ConversationsProvider = ({ id, children }) => {
 				return contact.id === message.sender;
 			});
 			const name = (contact && contact.name) || message.sender;
-			const fromMe = message.sender === id;
+			const fromMe = id === message.sender;
 			return { ...message, senderName: name, fromMe };
 		});
 
@@ -93,10 +89,10 @@ export const ConversationsProvider = ({ id, children }) => {
 
 	const value = {
 		conversations: formattedConversations,
-		createConversations,
-		sendMessage,
 		selectedConversation: formattedConversations[selectedConversationIndex],
+		sendMessage,
 		selectConversationIndex: setSelectedConversationIndex,
+		createConversation,
 	};
 
 	return (
@@ -104,16 +100,15 @@ export const ConversationsProvider = ({ id, children }) => {
 			{children}
 		</ConversationsContext.Provider>
 	);
-};
+}
 
-const arrayEquality = (a, b) => {
-	if (a.length !== b.length) {
-		return false;
-	}
+function arrayEquality(a, b) {
+	if (a.length !== b.length) return false;
+
 	a.sort();
 	b.sort();
 
-	return a.every((elem, index) => {
-		return elem === b[index];
+	return a.every((element, index) => {
+		return element === b[index];
 	});
-};
+}

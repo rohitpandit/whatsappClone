@@ -2,7 +2,7 @@ import React from 'react';
 import { ListGroup } from 'react-bootstrap';
 import { useConversations } from '../contexts/ConversationsProvider';
 
-const Conversations = () => {
+export default function Conversations() {
 	const { conversations, selectConversationIndex } = useConversations();
 
 	return (
@@ -11,15 +11,11 @@ const Conversations = () => {
 				<ListGroup.Item
 					key={index}
 					action
-					active={conversation.selected}
-					onClick={() => {
-						selectConversationIndex(index);
-					}}>
-					{conversation.recipients.map((r) => r.name).join(',')}
+					onClick={() => selectConversationIndex(index)}
+					active={conversation.selected}>
+					{conversation.recipients.map((r) => r.name).join(', ')}
 				</ListGroup.Item>
 			))}
 		</ListGroup>
 	);
-};
-
-export default Conversations;
+}
