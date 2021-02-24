@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import { useConversations } from '../contexts/ConversationsProvider';
+import OpenConversation from './OpenConversation';
 
 const Dashboard = ({ id }) => {
 	const selectedConversation = useConversations();
