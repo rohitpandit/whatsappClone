@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { useContacts } from './ContactsProvider';
 
 const ConversationsContext = React.createContext();
 
@@ -12,6 +13,8 @@ export const ConversationsProvider = ({ children }) => {
 		'Conversations',
 		[]
 	);
+	const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
+	const { contacts } = useContacts();
 
 	const createConversations = (recipients) => {
 		setConversations((prevConversations) => {
@@ -19,9 +22,28 @@ export const ConversationsProvider = ({ children }) => {
 		});
 	};
 
+	const formattedConversations = conversations.map((conversation, index) => {
+		const recipients = conversation.recipients.map((recipient) => {
+			const contact = contacts.find((contact) => {
+				return contact.id === recipient;
+			});
+			const name = (contact && contact.name) || recipient;
+			return { id: recipient, name };
+		});
+		const selected = index === selectedConversationIndex;
+
+		return { ...conversation, recipients, selected };
+	});
+
+	const value = {
+		conversations: formattedConversations,
+		createConversations,
+		selectedConversation: formattedConversations[selectedConversationIndex],
+		selectConversationIndex: setSelectedConversationIndex,
+	};
+
 	return (
-		<ConversationsContext.Provider
-			value={{ conversations, createConversations }}>
+		<ConversationsContext.Provider value={value}>
 			{children}
 		</ConversationsContext.Provider>
 	);
